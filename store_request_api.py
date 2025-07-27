@@ -10,9 +10,11 @@ store_requests_db = []
 
 # --- Schemas ---
 class StoreRequest(BaseModel):
-    store_id: str
-    items: List[str]
-    urgency: str
+    store_id: int
+    store_name: str
+    latitude: float
+    longitude: float
+    items_needed: List[str]
 
 # --- .NET Predictor Caller ---
 def call_dotnet_predictor(store_id, item, last_week_sales, avg_sales, day_of_week):
