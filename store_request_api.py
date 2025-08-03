@@ -10,7 +10,7 @@ store_requests_db = []
 
 # --- Schemas ---
 class StoreRequest(BaseModel):
-    store_id: int
+    store_id: str  # changed to string
     store_name: str
     latitude: float
     longitude: float
@@ -37,14 +37,14 @@ def call_dotnet_predictor(store_id, item, last_week_sales, avg_sales, day_of_wee
 # --- Submit Store Request ---
 @router.post("/request")
 def submit_store_request(request: StoreRequest):
-    store_requests_db.append(request)
+    store_requests_db.append(request.dict())
     return {
         "message": "Store request submitted successfully",
-        "data": request
+        "data": request.dict()
     }
 
 # --- Get All Requests ---
-@router.get("/requests")
+@router.get("/request")  # fixed path
 def get_all_requests():
     if not store_requests_db:
         raise HTTPException(status_code=404, detail="No store requests found.")
@@ -53,14 +53,13 @@ def get_all_requests():
 # --- Predict Inventory using .NET API ---
 @router.post("/predict")
 def predict_inventory(request: StoreRequest):
-    # Dummy data for now
     last_week_sales = 120
     avg_sales = 110
     day_of_week = "Monday"
 
     result = call_dotnet_predictor(
         store_id=request.store_id,
-        item=request.items[0],
+        item=request.items_needed[0],
         last_week_sales=last_week_sales,
         avg_sales=avg_sales,
         day_of_week=day_of_week
